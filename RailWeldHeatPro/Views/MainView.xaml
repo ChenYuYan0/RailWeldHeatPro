@@ -1,0 +1,156 @@
+﻿<Window
+    x:Class="RailWeldHeatPro.Views.MainView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RailWeldHeatPro.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:RailWeldHeatPro.ViewModels"
+    Title="MainView"
+    Width="1280"
+    Height="800"
+    d:DataContext="{d:DesignInstance vm:MainViewModel}"
+    Style="{StaticResource MaterialDesignWindow}"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None"
+    mc:Ignorable="d">
+    <!--  左侧隐藏栏  -->
+    <materialDesign:DialogHost>
+        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+            <materialDesign:DrawerHost.LeftDrawerContent>
+                <DockPanel MinWidth="200">
+                    <!--  原本的返回按钮改成grid横向包括textbox+button  -->
+                    <Grid Background="{DynamicResource PrimaryHueMidBrush}" DockPanel.Dock="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Column="0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="25"
+                            Style="{StaticResource TextBlockFontStyle}">
+                            系统菜单
+                        </TextBlock>
+                        <ToggleButton
+                            Grid.Column="1"
+                            Margin="16"
+                            HorizontalAlignment="Right"
+                            DockPanel.Dock="Top"
+                            IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"
+                            Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+                    </Grid>
+                    <!--  ListView相比普通的 ListBox支持多种视图模式(如 GridView、List、Icon 等），可通过 ListView.View 属性切换。  -->
+                    <ListView
+                        x:Name="DemoItemsListView"
+                        Margin="0,16,0,16"
+                        FontSize="20"
+                        ItemsSource="{Binding DemoItems}"
+                        PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp"
+                        SelectedIndex="0">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="界面选择">
+                                    <!--  目录选项模板  -->
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Margin="8" Orientation="Horizontal">
+                                                <materialDesign:PackIcon
+                                                    Width="32"
+                                                    Height="32"
+                                                    Margin="0,0,8,0"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Kind="Airplay" />
+                                                <TextBlock
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Path=Name}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </DockPanel>
+            </materialDesign:DrawerHost.LeftDrawerContent>
+
+            <!--  主界面  -->
+            <DockPanel>
+                <!--  顶部紫条  -->
+                <materialDesign:ColorZone
+                    Padding="16"
+                    materialDesign:ElevationAssist.Elevation="Dp4"
+                    DockPanel.Dock="Top"
+                    Mode="PrimaryMid">
+                    <DockPanel>
+                        <ToggleButton
+                            x:Name="MenuToggleButton"
+                            IsChecked="False"
+                            Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+
+                        <materialDesign:PopupBox
+                            DockPanel.Dock="Right"
+                            PlacementMode="BottomAndAlignRightEdges"
+                            StaysOpen="False">
+                            <StackPanel>
+                                <Button Click="MenuPopupButton_OnClick" Content="重启计算机" />
+                                <Button Click="MenuPopupButton_OnClick" Content="关闭计算机" />
+                                <Separator />
+                                <Button Click="MenuPopupButton_OnClick" Content="退出系统" />
+                            </StackPanel>
+                        </materialDesign:PopupBox>
+                        <TextBlock FontSize="30" TextAlignment="Center">全自动钢轨焊接接头热处理设备</TextBlock>
+                    </DockPanel>
+                </materialDesign:ColorZone>
+
+                <!--  底部菜单条  -->
+                <Grid DockPanel.Dock="Bottom">
+                    <Grid Margin="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <!--  第一列占满剩余所有空间，第二列根据内容自动调整  -->
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                <TextBlock Text="当前界面: " />
+                                <TextBlock Text="{Binding ElementName=DemoItemsListView, Path=SelectedItem.Name}" />
+
+                                <TextBlock Margin="20,0,0,0">版本号:</TextBlock>
+                                <TextBlock Text="{Binding Path=VersionNumber}" />
+                                <TextBlock Margin="20,0,0,0">通讯状态：</TextBlock>
+                                <TextBlock Text="{Binding Path=ConnectionState}" />
+                                <TextBlock Margin="20,0,0,0" Foreground="DodgerBlue">焊缝编号：</TextBlock>
+                                <TextBlock Foreground="DodgerBlue" Text="{Binding Path=ProductNumber}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <TextBlock>时间：</TextBlock>
+                                <TextBlock Text="{Binding Path=SystempDateTime}" />
+                                <TextBlock Margin="20,0,0,0">通讯延迟：</TextBlock>
+                                <TextBlock Text="{Binding Path=ConnectionDelay}" />
+                                <TextBlock>ms</TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <!--  剩余的中间内容控件  -->
+                <Grid>
+                    <ContentControl x:Name="UserContentControl" Content="{Binding ElementName=DemoItemsListView, Path=SelectedItem.Content}" />
+                    <materialDesign:Snackbar x:Name="SoftSnackbar" MessageQueue="{materialDesign:MessageQueue}" />
+                </Grid>
+
+
+            </DockPanel>
+        </materialDesign:DrawerHost>
+
+
+
+    </materialDesign:DialogHost>
+
+</Window>

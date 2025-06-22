@@ -1,0 +1,142 @@
+﻿<Window
+    x:Class="RailWeldHeatPro.Views.LoginView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RailWeldHeatPro.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:RailWeldHeatPro.ViewModels"
+    Title="LoginView"
+    Width="500"
+    Height="400"
+    d:DataContext="{d:DesignInstance vm:LoginViewModel}"
+    ResizeMode="NoResize"
+    Style="{StaticResource MaterialDesignWindow}"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="None"
+    mc:Ignorable="d">
+    <StackPanel>
+        <materialDesign:Card Height="49" Background="{DynamicResource PrimaryHueLightBrush}">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="20"
+                Foreground="Black"
+                Text="钢轨焊缝人员信息设置" />
+        </materialDesign:Card>
+        <!--  定义表格行列  -->
+        <Grid Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <!--  margin左上右下  -->
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="0,0,15,0"
+                HorizontalAlignment="Right"
+                Content="操作员:"
+                FontSize="20" />
+            <ComboBox
+                Grid.Row="0"
+                Grid.Column="1"
+                Width="120"
+                HorizontalAlignment="Left"
+                materialDesign:HintAssist.Hint="操作员选择"
+                FontSize="20"
+                ItemsSource="{Binding OperatorNames, Mode=TwoWay}"
+                SelectedItem="{Binding SelectedOperatorName, Mode=OneWayToSource}" />
+            <Label
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="0,15,15,0"
+                HorizontalAlignment="Right"
+                Content="生产线:"
+                FontSize="20" />
+            <ComboBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Width="120"
+                Margin="0,15,0,0"
+                HorizontalAlignment="Left"
+                materialDesign:HintAssist.Hint="生产线名称"
+                FontSize="20"
+                ItemsSource="{Binding LineNames, Mode=TwoWay}"
+                SelectedItem="{Binding SelectedLineName, Mode=OneWayToSource}" />
+
+            <Label
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="0,15,15,0"
+                HorizontalAlignment="Right"
+                Content="班组:"
+                FontSize="20" />
+            <ComboBox
+                Grid.Row="2"
+                Grid.Column="1"
+                Width="120"
+                Margin="0,15,0,0"
+                HorizontalAlignment="Left"
+                materialDesign:HintAssist.Hint="班组"
+                FontSize="20"
+                ItemsSource="{Binding GroupNames, Mode=TwoWay}"
+                SelectedValue="{Binding SelectedGroupName, Mode=OneWayToSource}" />
+            <Label
+                Grid.Row="3"
+                Grid.Column="0"
+                Margin="0,15,15,0"
+                HorizontalAlignment="Right"
+                Content="日期:"
+                FontSize="20" />
+
+            <DatePicker
+                Grid.Row="3"
+                Grid.Column="1"
+                Width="120"
+                Margin="0,15,0,0"
+                HorizontalAlignment="Left"
+                FontSize="20"
+                SelectedDate="{Binding SelectedDate, Mode=OneWayToSource}" />
+            <Label
+                Grid.Row="4"
+                Grid.Column="0"
+                Margin="0,15,15,0"
+                HorizontalAlignment="Right"
+                Content="接头号:"
+                FontSize="20" />
+            <TextBox
+                Grid.Row="4"
+                Grid.Column="1"
+                Width="120"
+                Margin="0,15,15,0"
+                HorizontalAlignment="Left"
+                materialDesign:HintAssist.Hint="接头号"
+                FontSize="20"
+                Text="{Binding SpliceNumber, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+        <StackPanel Orientation="Horizontal">
+            <Canvas>
+                <Button
+                    Canvas.Left="160"
+                    Command="{Binding LoginCommand}"
+                    Content="确定" />
+                <Button
+                    Canvas.Left="300"
+                    Command="{Binding LogoutCommand}"
+                    Content="退出" />
+            </Canvas>
+
+        </StackPanel>
+    </StackPanel>
+</Window>
