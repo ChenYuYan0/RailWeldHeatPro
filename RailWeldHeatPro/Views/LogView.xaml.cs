@@ -18,11 +18,11 @@ using System.Windows.Shapes;
 namespace RailWeldHeatPro.Views
 {
     /// <summary>
-    /// MachineToolView.xaml 的交互逻辑
+    /// LogView.xaml 的交互逻辑
     /// </summary>
-    public partial class MachineToolView : UserControl
+    public partial class LogView : UserControl
     {
-        public MachineToolView()
+        public LogView()
         {
             InitializeComponent();
             InitData();
@@ -30,7 +30,7 @@ namespace RailWeldHeatPro.Views
 
         private void InitData()
         {
-            MachineToolViewModel viewModel = App.Current.ServiceProviders.GetService<MachineToolViewModel>();
+            LogViewModel viewModel = App.Current.ServiceProviders.GetService<LogViewModel>();
             DataContext = viewModel;
         }
     }

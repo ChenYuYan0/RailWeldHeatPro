@@ -1,4 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog;
+using NLog.Extensions.Logging;
+using RailWeldHeatPro.Helper;
+using RailWeldHeatPro.Models;
 using RailWeldHeatPro.Views;
 using System.Configuration;
 using System.Data;
@@ -42,6 +48,10 @@ namespace RailWeldHeatPro
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            if (!HslCommunication.Authorization.SetAuthorizationCode("e0397905-7455-4533-8c7a-3ec89b68b2a7"))
+            {
+                System.Windows.Forms.MessageBox.Show("active failed");
+            }
             //显示默认登录窗体
             //ServiceProviders.GetService<LoginView>().Show();
             ServiceProviders.GetService<MainView>().Show();
@@ -53,10 +63,64 @@ namespace RailWeldHeatPro
             //服务容器
             var serviceCollection = new ServiceCollection();
 
+            //注入配置类
+            ConfigureJson(serviceCollection);
+
             //注册Views层与ViewModels层中的对象
             RegisterViewsAndViewModels(serviceCollection);
 
+            //注册GlobalConfig
+            serviceCollection.AddSingleton<GlobalConfig>();
+
             return serviceCollection.BuildServiceProvider();
+        }
+
+        /// <summary>
+        /// 注入json配置文件
+        /// </summary>
+        private void ConfigureJson(ServiceCollection serviceCollection)
+        {
+            //构建配置类
+            IConfiguration configuration = new ConfigurationBuilder()
+                .SetBasePath(Environment.CurrentDirectory + "\\Config")
+                .AddJsonFile("appsettings.json").Build();
+            //将配置类注册到容器中
+            serviceCollection.AddSingleton<IConfiguration>(configuration);
+
+            //连接数据库
+            var parseResult = Enum.TryParse<SqlSugar.DbType>(configuration["SqlParam:DbType"], out var dbType);
+            var connectionString = configuration["SqlParam:ConnectionString"];
+            if (parseResult)
+            {
+                SqlSugarHelper.AddSqlSugarSetup(dbType, connectionString);
+            }
+
+            //日志配置
+            /*
+            log.ClearProviders();清空默认的 Console/Debug 等 Provider
+            log.SetMinimumLevel(LogLevel.Trace);设置最小日志级别
+            log.AddNLog(); 把 NLog 接入日志系统
+             */
+            serviceCollection.AddLogging(log => {
+                log.ClearProviders();
+                log.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                log.AddNLog();
+            });
+            //从json配置文件中读取nlog的相关参数
+            var nLogConfig = configuration.GetSection("NLog");
+            LogManager.Configuration = new NLogLoggingConfiguration(nLogConfig);
+
+            //参数映射
+            /*
+             只有先执行了 AddOptions()，后面的 Configure<T>() 才能正常把服务放进容器。
+             AddOptions()
+            .Configure<RootParam>(e => configuration.Bind(e))把整个 IConfiguration（appsettings.json 的根对象）一次性绑定到 RootParam 实例 e 上
+             */
+            serviceCollection.AddOptions()
+                .Configure<RootParam>(e => configuration.Bind(e))
+                .Configure<SqlParam>(e => configuration.GetSection("SqlParam").Bind(e))
+                .Configure<SystemParam>(e => configuration.GetSection("SystemParam").Bind(e))
+                .Configure<PlcParam>(e => configuration.GetSection("PlcParam").Bind(e)); ;
         }
 
         //注册Views层与ViewModels层中的对象

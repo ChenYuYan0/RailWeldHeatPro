@@ -1,6 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RailWeldHeatPro.Helper;
+using RailWeldHeatPro.Models;
 using RailWeldHeatPro.Views;
 using System;
 using System.Collections.Generic;
@@ -10,15 +14,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using RailWeldHeatPro.Models;
-using Newtonsoft.Json;
-using Microsoft.Extensions.DependencyInjection;
 
 
 namespace RailWeldHeatPro.ViewModels
 {
     public partial class LoginViewModel : ObservableObject
     {
+        private readonly ILogger<ChartViewModel> _logger;
         /// <summary>
         /// 操作员名称列表
         /// </summary>
@@ -69,14 +71,21 @@ namespace RailWeldHeatPro.ViewModels
         private string _spliceNumber;
 
         /// <summary>
+        /// 完整的焊接编号
+        /// </summary>
+        [ObservableProperty]
+        private string _productNumberFull;
+
+        /// <summary>
         /// 登录窗体关闭的事件
         /// </summary>
         public event EventHandler CloseLoginView;
 
 
 
-        public LoginViewModel()
+        public LoginViewModel(ILogger<ChartViewModel> logger)
         {
+            _logger = logger;
             InitComboxData();
             
         }
@@ -86,9 +95,9 @@ namespace RailWeldHeatPro.ViewModels
         /// </summary>
         private void InitComboxData()
         {
-            AddDataToComboxItemSource(Globals.OperatorNamesPath, ref _operatorNames);
-            AddDataToComboxItemSource(Globals.LineNamesPath, ref _lineNames);
-            AddDataToComboxItemSource(Globals.GroupNamesPath, ref _groupNames);
+            AddDataToComboxItemSource(GlobalPath.OperatorNamesPath, ref _operatorNames);
+            AddDataToComboxItemSource(GlobalPath.LineNamesPath, ref _lineNames);
+            AddDataToComboxItemSource(GlobalPath.GroupNamesPath, ref _groupNames);
         }
 
         /// <summary>
@@ -108,7 +117,7 @@ namespace RailWeldHeatPro.ViewModels
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message); ;
+                Console.WriteLine(ex.Message); 
             }
         }
 
@@ -118,8 +127,8 @@ namespace RailWeldHeatPro.ViewModels
         [RelayCommand]
         void Login()
         {
-           MessageBox.Show(SelectedOperatorName.ToString()+"-"+SelectedLineName.ToString()+"-" +
-                SelectedGroupName + "-" + SelectedDate?.ToString("yyyy-MM-dd")+"-"+SpliceNumber);
+           //MessageBox.Show(SelectedOperatorName.ToString()+"-"+SelectedLineName.ToString()+"-" +
+           //     SelectedGroupName + "-" + SelectedDate?.ToString("yyyy-MM-dd")+"-"+SpliceNumber);
 
             //将用户信息序列化成json对象并保存
             LoginUser currentLoginUser = new LoginUser()
@@ -130,16 +139,15 @@ namespace RailWeldHeatPro.ViewModels
                 LoginDate = (DateTime)SelectedDate,
                 SpliceNumber = SpliceNumber.ToString()
             };
-            FileHelper.WriteToFile(Globals.LoginUserPath, JsonConvert.SerializeObject(currentLoginUser));
+            FileHelper.WriteToFile(GlobalPath.LoginUserPath, JsonConvert.SerializeObject(currentLoginUser));
+            //赋值焊接编号
+            ProductNumberFull = GetProductNumber(currentLoginUser);
 
             //先开启主窗体，后关闭登录窗口
             MainView mainView = App.Current.ServiceProviders.GetService<MainView>();
             mainView?.Show();
-
+            _logger.LogInformation("登录系统成功");
             CloseLoginView?.Invoke(this, EventArgs.Empty);
-            
-
-
         }
 
         /// <summary>
@@ -148,7 +156,21 @@ namespace RailWeldHeatPro.ViewModels
         [RelayCommand]
         void Logout()
         {
+            _logger.LogInformation("退出系统成功");
             Environment.Exit(0);//结束进程
+        }
+
+
+
+        /// <summary>
+        /// 获得完整的焊缝编号
+        /// </summary>
+        /// <param name="loginUser">登录用户对象</param>
+        /// <returns>完整焊缝编号</returns>
+        public string GetProductNumber(LoginUser loginUser)
+        {
+            ProductNumberFull = loginUser.OperatorName + loginUser.LineName + loginUser.GroupName + loginUser.LoginDate.ToString("yyyy-MM-dd") + loginUser.SpliceNumber;
+            return ProductNumberFull;
         }
     }
 }

@@ -18,11 +18,13 @@ using System.Windows.Shapes;
 namespace RailWeldHeatPro.Views
 {
     /// <summary>
-    /// MachineToolView.xaml 的交互逻辑
+    /// ChartView.xaml 的交互逻辑
     /// </summary>
-    public partial class MachineToolView : UserControl
+    public partial class ChartView : UserControl
     {
-        public MachineToolView()
+        private ChartViewModel _chartViewModel;
+
+        public ChartView()
         {
             InitializeComponent();
             InitData();
@@ -30,8 +32,15 @@ namespace RailWeldHeatPro.Views
 
         private void InitData()
         {
-            MachineToolViewModel viewModel = App.Current.ServiceProviders.GetService<MachineToolViewModel>();
-            DataContext = viewModel;
+            _chartViewModel = App.Current.ServiceProviders.GetService<ChartViewModel>();
+            DataContext = _chartViewModel;
+            Loaded += ChartView_Loaded;
+        }
+
+
+        private void ChartView_Loaded(object sender, RoutedEventArgs e)
+        {
+            _chartViewModel.InitPlot(TimeDataPlot);
         }
     }
 }

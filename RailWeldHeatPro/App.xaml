@@ -13,6 +13,9 @@
                     SecondaryColor="Lime" />
 
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" />
+
+                <!--  local Resources  -->
+                <ResourceDictionary Source="/Styles/CtyButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!--  TextBlock 设置为Microsoft YaHei  -->
@@ -21,10 +24,7 @@
             </Style>
 
             <!--  GridViewColumnHeader 设置为Microsoft YaHei  -->
-            <Style x:Key="GridViewHeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
-
-
-            </Style>
+            <Style x:Key="GridViewHeaderStyle" TargetType="{x:Type GridViewColumnHeader}" />
 
             <SolidColorBrush x:Key="PrimaryHueLightBrush" Color="#673AB7" />
         </ResourceDictionary>

@@ -10,7 +10,6 @@
     Title="LoginView"
     Width="500"
     Height="400"
-    d:DataContext="{d:DesignInstance vm:LoginViewModel}"
     ResizeMode="NoResize"
     Style="{StaticResource MaterialDesignWindow}"
     WindowStartupLocation="CenterScreen"
@@ -25,8 +24,13 @@
                 Foreground="Black"
                 Text="钢轨焊缝人员信息设置" />
         </materialDesign:Card>
+        <TextBlock
+            Width="500"
+            FontSize="20"
+            Text="{Binding ProductNumberFull}"
+            TextAlignment="Center" />
         <!--  定义表格行列  -->
-        <Grid Margin="30">
+        <Grid Margin="20">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />

@@ -10,7 +10,6 @@
     Title="MainView"
     Width="1280"
     Height="800"
-    d:DataContext="{d:DesignInstance vm:MainViewModel}"
     Style="{StaticResource MaterialDesignWindow}"
     WindowStartupLocation="CenterScreen"
     WindowStyle="None"
